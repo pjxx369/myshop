@@ -8,12 +8,19 @@ import 'element-ui/lib/theme-chalk/index.css';
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 
+import Fragment from 'vue-fragment'
+
+
+Vue.use(Fragment.Plugin)
+
 Vue.use(VueAxios, axios)
 
 Vue.use(ElementUI);
 
 
 Vue.config.productionTip = false
+
+
 
 new Vue({
     router,

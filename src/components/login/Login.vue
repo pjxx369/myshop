@@ -75,7 +75,6 @@ export default {
           //储存token
           let  token  = res.data.token;
           window.sessionStorage.setItem("token", token);
-          
           this.$router.push('/home')
         } else {
           this.$message.error("登录失败");
