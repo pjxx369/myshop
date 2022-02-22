@@ -72,7 +72,7 @@
                   type="warning"
                   icon="el-icon-setting"
                   circle
-                  
+                  @click="updateRole(scope.row)"
                 ></el-button>
               </el-tooltip>
             </template>
@@ -147,6 +147,36 @@
         <el-button type="primary" @click="editUserInfo">确 定</el-button>
       </span>
     </el-dialog>
+
+    <!-- 分配角色对话框 -->
+    <el-dialog title="分配角色"
+     :visible.sync="setRoleDialogVisible"
+      width="50%"
+      @close="setRoleOut"
+      >
+      <div>
+        <p>当前的用户：{{ userInfo.username }}</p>
+        <p>当前的角色：{{ userInfo.role_name }}</p>
+        <p>
+          分配新角色：
+          <el-select v-model="selectRoleId" placeholder="请选择">
+            <el-option
+              v-for="item in rolesList"
+              :key="item.id"
+              :label="item.roleName"
+              :value="item.id"
+            >
+            </el-option>
+          </el-select>
+        </p>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="setRoleDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="saveRoleInfo"
+          >确 定</el-button
+        >
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -214,6 +244,10 @@ export default {
       },
       editDialogVisible: false,
       editForm: {},
+      setRoleDialogVisible: false,
+      userInfo: {},
+      rolesList: [],
+      selectRoleId:''
     };
   },
   created() {
@@ -222,6 +256,7 @@ export default {
       path: "get",
       params: this.queryinfo,
     }).then((res) => {
+      console.log(res);
       this.userlist = res.data.users;
       this.total = res.data.total;
     });
@@ -312,7 +347,6 @@ export default {
     },
     //编辑信息
     showEditDialog(id) {
-      console.log(id);
       this.editDialogVisible = true;
       http({
         url: "/users/" + id,
@@ -332,42 +366,79 @@ export default {
         http({
           url: `users/${this.editForm.id}`,
           method: "put",
-          data:{
+          data: {
             email: this.editForm.email,
-          mobile: this.editForm.mobile,
-          }
+            mobile: this.editForm.mobile,
+          },
         }).then((res) => {
-          this.getUserList()
+          this.getUserList();
         });
       });
-      this.editDialogVisible = false
-      this.$message.success('更新用户信息成功')
+      this.editDialogVisible = false;
+      this.$message.success("更新用户信息成功");
     },
     //根据Id删除用户信息
-    removeUserByid(id){
+    removeUserByid(id) {
       //弹框是否删除
-      this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(()=>{
+      this.$confirm("此操作将永久删除该用户, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
           // 删除用户请求
           http({
-            url:'/users/'+id,
-            method:'delete'
-          }).then(res=>{
-            this.getUserList()
+            url: "/users/" + id,
+            method: "delete",
+          }).then((res) => {
+            this.getUserList();
             this.$message({
-            type:'success',
-            message:'删除成功'
+              type: "success",
+              message: "删除成功",
+            });
           });
-          })
-        }).catch(()=>{
-          this.$message({
-            type:'info',
-            message:'已取消'
-          })
         })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消",
+          });
+        });
+    },
+    updateRole(userInfo) {
+      this.userInfo = userInfo;
+      http({
+        url: "/roles",
+        method: "get",
+      }).then((res) => {
+        this.rolesList = res.data;
+        console.log(res);
+        console.log(this.userInfo);
+      });
+
+      this.setRoleDialogVisible = true;
+    },
+    saveRoleInfo(){
+      if(!this.selectRoleId){
+        this.$message.error('请选择要分配的角色')
+        return
+      }
+
+      http({
+        url:`/users/${this.userInfo.id}/role`,
+        method:'put',
+        data:{
+          rid:this.selectRoleId
+        }
+      }).then(res=>{
+        this.$message.success('分配角色成功!')
+        this.getUserList()
+        this.setRoleDialogVisible = false
+      })
+    },
+    setRoleOut(){
+      this.selectRoleId=''
+      this.userInfo=''
     }
   },
   components: {},
