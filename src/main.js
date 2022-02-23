@@ -9,6 +9,8 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 
 import Fragment from 'vue-fragment'
+import TreeTable from 'vue-table-with-tree-grid'
+Vue.component('tree-table', TreeTable)
 
 
 Vue.use(Fragment.Plugin)

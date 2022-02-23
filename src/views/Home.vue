@@ -88,7 +88,6 @@ export default {
       this.menuslist = res.data;
     });
     this.activePath = window.sessionStorage.getItem("activePath");
-    console.log(this.activePath);
   },
 
   methods: {
