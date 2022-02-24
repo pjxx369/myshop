@@ -280,13 +280,11 @@ export default {
           sel: this.activeName,
         },
       }).then((res) => {
-        console.log(res);
         res.data.forEach((item) => {
           item.attr_vals = item.attr_vals ? item.attr_vals.split(" ") : [];
           item.inputVisible = false;
           item.inputValue = "";
         });
-        console.log(res.data);
         if (this.activeName === "many") {
           this.manyTableData = res.data;
         } else {
@@ -308,7 +306,6 @@ export default {
             attr_sel: this.activeName,
           },
         }).then((res) => {
-          console.log(res);
           this.$message.success("添加成功");
           this.addDialogVisible = false;
           this.getCateData();
